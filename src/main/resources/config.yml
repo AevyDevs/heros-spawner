@@ -1,0 +1,11 @@
+debug-mode: false
+db:
+  url: mariadb
+  driver: org.mariadb.jdbc.Driver
+  debug: true
+  max-pool-size: 6
+  ip: localhost
+  port: 3306
+  user: root
+  password: null
+  database: faction

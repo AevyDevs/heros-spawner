@@ -1,0 +1,6 @@
+name: heros-spawner
+version: ${project.version}
+main: net.herospvp.herosspawner.HerosSpawner
+authors: [ Niketion ]
+commands:
+  spawner:
