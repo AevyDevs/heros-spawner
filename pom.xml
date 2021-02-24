@@ -78,10 +78,11 @@
     <dependencies>
         <!-- spigot -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>com.reliablespigot</groupId>
+            <artifactId>reliablespigot</artifactId>
+            <version>2.3.1</version>
+            <systemPath>${basedir}/libs/ReliableSpigot_2.3.1.jar</systemPath>
+            <scope>system</scope>
         </dependency>
 
         <!-- heros cores -->

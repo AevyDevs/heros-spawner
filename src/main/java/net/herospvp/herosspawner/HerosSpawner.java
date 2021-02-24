@@ -4,10 +4,17 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
 import net.herospvp.database.Director;
 import net.herospvp.database.Musician;
+import net.herospvp.herosspawner.commands.CollectorCommand;
 import net.herospvp.herosspawner.commands.SpawnerCommand;
+import net.herospvp.herosspawner.handlers.CollectorHandler;
+import net.herospvp.herosspawner.handlers.HologramHandler;
 import net.herospvp.herosspawner.handlers.SpawnerHandler;
 import net.herospvp.herosspawner.handlers.TaskHandler;
+import net.herospvp.herosspawner.listeners.CollectorListener;
+import net.herospvp.herosspawner.listeners.EntityListener;
+import net.herospvp.herosspawner.listeners.FactionListener;
 import net.herospvp.herosspawner.listeners.SpawnerListener;
+import net.herospvp.herosspawner.objects.Collector;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,7 +35,9 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
     private Musician musician;
 
     private TaskHandler taskHandler;
+    private HologramHandler hologramHandler;
     private SpawnerHandler spawnerHandler;
+    private CollectorHandler collectorHandler;
 
     private WorldGuardPlugin worldGuardPlugin;
 
@@ -41,11 +50,20 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         this.initializeDatabase();
 
         this.spawnerHandler = new SpawnerHandler(this);
+        this.hologramHandler = new HologramHandler(this);
         this.taskHandler = new TaskHandler(this);
+        this.collectorHandler = new CollectorHandler(this);
+        spawnerHandler.loadAll(result -> {
+            this.hologramHandler.load(result);
+        });
 
         new SpawnerCommand(this);
+        new CollectorCommand(this);
 
         new SpawnerListener(this);
+        new FactionListener(this);
+        new EntityListener(this);
+        new CollectorListener(this);
     }
 
     @Override

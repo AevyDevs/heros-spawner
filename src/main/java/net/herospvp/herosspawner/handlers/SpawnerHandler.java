@@ -2,6 +2,7 @@ package net.herospvp.herosspawner.handlers;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import lombok.Getter;
 import net.herospvp.database.Musician;
 import net.herospvp.database.items.Instrument;
 import net.herospvp.database.items.Notes;
@@ -20,11 +21,10 @@ import net.prosavage.factionsx.core.Faction;
 import net.prosavage.factionsx.manager.GridManager;
 import net.prosavage.factionsx.manager.PlayerManager;
 import net.prosavage.factionsx.util.SpecialAction;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,10 +32,8 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class SpawnerHandler {
     private final Notes notes;
@@ -58,7 +56,10 @@ public class SpawnerHandler {
         this.notes = new Notes("spawners");
 
         this.musician.update(startup());
-        this.musician.update(loadAll());
+    }
+
+    public Collection<CustomSpawner> getSpawners() {
+        return spawners.values();
     }
 
     public CustomSpawner getSpawner(Location location) {
@@ -71,9 +72,44 @@ public class SpawnerHandler {
         return spawners.get(blockLoc);
     }
 
-    public void remove(Player player, CustomSpawner customSpawner) {
+    public boolean breakSpawner(Player player, CustomSpawner spawner) {
+        FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(player.getUniqueId());
+
+        if (!player.hasPermission("herospvp.admin")) {
+            if (player.getItemInHand() == null || !(player.getItemInHand().getType() == Material.DIAMOND_PICKAXE && player.getItemInHand()
+                    .getEnchantmentLevel(Enchantment.SILK_TOUCH) != 0)) {
+                Message.sendMessage(player, MessageType.WARNING, "Spawner", "Devi avere un piccone &esilk touch &fper poter raccogliere lo spawner!");
+                return false;
+            }
+
+            Faction factionLoc = GridManager.INSTANCE.getFactionAt(spawner.getLocation().getChunk());
+            if (player.getGameMode() == GameMode.CREATIVE) {
+                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Non puoi rompere spawner in &ecreative mode&f!");
+                return false;
+            }
+
+            if (factionLoc.isSystemFaction() || factionLoc.getId() != fPlayer.getFaction().getId()) {
+                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Puoi rompere gli spawner solo nei claim della tua fazione!");
+                return false;
+            }
+
+            if (!FactionUtils.isMod(fPlayer)) {
+                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere almeno mod per poter raccogliere gli spawner!");
+                return false;
+            }
+        }
+
+        this.breakSpawner(spawner);
+        return true;
+    }
+
+    public void breakSpawner(CustomSpawner customSpawner) {
         spawners.remove(customSpawner.getLocation());
         toRemove.add(customSpawner.getId());
+        plugin.getHologramHandler().removeHologram(customSpawner.getId());
+
+        customSpawner.getLocation().getWorld().dropItem(customSpawner.getLocation(), new SpawnerItem(customSpawner.getEntityType()).build(customSpawner.getAmount()));
+
         Debug.send("heros-spawner", "remove spawner ID:{0}", customSpawner.getId());
     }
 
@@ -100,9 +136,10 @@ public class SpawnerHandler {
 
         CustomSpawner customSpawner = getSpawner(block);
         customSpawner.setAmount(customSpawner.getAmount()+amount);
+        plugin.getHologramHandler().updateHologram(customSpawner);
     }
 
-    public void place(Player player, ItemStack item, Block block) {
+    public boolean place(Player player, ItemStack item, Block block) {
         FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(player.getUniqueId());
 
         Debug.send("heros-spawner", "placing mobspawner [Player:{0}, Item:{1}, Loc<{2}>]", player.getName(), item.getType(),
@@ -112,17 +149,17 @@ public class SpawnerHandler {
             Faction factionLoc = GridManager.INSTANCE.getFactionAt(block.getChunk());
             if (fPlayer.getFaction().isWilderness()) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere in una fazione per poter piazzare gli spawner!");
-                return;
+                return false;
             }
 
             if (!FactionUtils.isMod(fPlayer)) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere almeno mod per poter piazzare gli spawner!");
-                return;
+                return false;
             }
 
             if (factionLoc.isSystemFaction() || factionLoc.getId() != fPlayer.getFaction().getId()) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Puoi piazzare gli spawner solo nei claim della tua fazione!");
-                return;
+                return false;
             }
         }
 
@@ -134,12 +171,17 @@ public class SpawnerHandler {
         block.getState().update(true);
 
         spawners.put(block.getLocation(), spawner);
+        plugin.getHologramHandler().createHologram(spawner);
+
         Debug.send("heros-spawner", "put in the map, contains: {0}", spawners.containsKey(block.getLocation()));;
+        return true;
     }
 
     public void purge() {
         musician.update(((connection, instrument) -> {
             spawners.clear();
+            plugin.getHologramHandler().purge();
+
             PreparedStatement preparedStatement = null;
             try {
                 preparedStatement = connection.prepareStatement(
@@ -174,8 +216,8 @@ public class SpawnerHandler {
         musician.update(saveAll());
     }
 
-    private Papers loadAll() {
-        return (connection, instrument) -> {
+    public void loadAll(Consumer<Collection<CustomSpawner>> result) {
+        this.musician.update((connection, instrument) -> {
             PreparedStatement preparedStatement = null;
             try {
                 preparedStatement = connection.prepareStatement(
@@ -199,8 +241,9 @@ public class SpawnerHandler {
                 e.printStackTrace();
             } finally {
                 instrument.close(preparedStatement);
+                result.accept(spawners.values());
             }
-        };
+        });
     }
 
     private Papers saveAll() {
