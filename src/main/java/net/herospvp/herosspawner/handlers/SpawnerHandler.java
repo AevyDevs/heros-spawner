@@ -1,7 +1,9 @@
 package net.herospvp.herosspawner.handlers;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.herospvp.database.Musician;
+import net.herospvp.database.items.Instrument;
 import net.herospvp.database.items.Notes;
 import net.herospvp.database.items.Papers;
 import net.herospvp.heroscore.utils.LocationUtils;
@@ -27,6 +29,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashSet;
@@ -41,10 +44,13 @@ public class SpawnerHandler {
     private final HerosSpawner plugin;
 
     private final Map<Location, CustomSpawner> spawners;
+    private final Set<Integer> toRemove;
     private int maxId;
 
     public SpawnerHandler(HerosSpawner plugin) {
         this.spawners = Maps.newConcurrentMap();
+        this.toRemove = Sets.newConcurrentHashSet();
+
         this.maxId = 0;
         this.plugin = plugin;
 
@@ -65,29 +71,31 @@ public class SpawnerHandler {
         return spawners.get(blockLoc);
     }
 
+    public void remove(Player player, CustomSpawner customSpawner) {
+        spawners.remove(customSpawner.getLocation());
+        toRemove.add(customSpawner.getId());
+        Debug.send("heros-spawner", "remove spawner ID:{0}", customSpawner.getId());
+    }
+
     public void addAmount(Player player, Block block) {
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();
 
-        Set<Integer> slots = new HashSet<>();
-        int count = -1;
+        Debug.send("heros-spawner", "spawnercreature: {0}", spawnerBlock.getSpawnedType().name());
+
         int amount = 0;
         for (ItemStack content : player.getInventory().getContents()) {
-            count++;
             if (content == null || content.getType() == Material.AIR) continue;
 
             EntityType entityType = SpawnerItem.getType(content);
             if (entityType == null || spawnerBlock.getSpawnedType() != entityType) continue;
 
             amount += content.getAmount();
-            slots.add(count);
+            player.getInventory().remove(content);
+            Debug.send("heros-spawner", "found spawner, amount actual: {0}", amount);
         }
 
         if (amount == 0) {
             return;
-        }
-
-        for (Integer slot : slots) {
-            player.getInventory().setItem(slot, null);
         }
 
         CustomSpawner customSpawner = getSpawner(block);
@@ -118,9 +126,32 @@ public class SpawnerHandler {
             }
         }
 
-        CustomSpawner spawner = new CustomSpawner(maxId++, fPlayer.getFaction().getId(), SpawnerItem.getType(item), 1, block.getLocation(), false);
+        maxId = maxId+1;
+        CustomSpawner spawner = new CustomSpawner(maxId, fPlayer.getFaction().getId(), SpawnerItem.getType(item), 1, block.getLocation(), false);
+
+        CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();
+        spawnerBlock.setSpawnedType(spawner.getEntityType());
+        block.getState().update(true);
+
         spawners.put(block.getLocation(), spawner);
         Debug.send("heros-spawner", "put in the map, contains: {0}", spawners.containsKey(block.getLocation()));;
+    }
+
+    public void purge() {
+        musician.update(((connection, instrument) -> {
+            spawners.clear();
+            PreparedStatement preparedStatement = null;
+            try {
+                preparedStatement = connection.prepareStatement(
+                        "DROP TABLE " + notes.getTable() + ";"
+                );
+                preparedStatement.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                instrument.close(preparedStatement);
+            }
+        }));
     }
 
     private Papers startup() {
@@ -180,10 +211,12 @@ public class SpawnerHandler {
                 if (spawners.isEmpty()) return;
 
                 for (CustomSpawner spawner : spawners.values()) {
-                    Debug.send("heros-spawner", "spawner: [ID:{0}, Loc:<{1}>, Amount:{2}]", spawner.getId(), LocationUtils.getLiteStringFromLocation(spawner.getLocation()), spawner.getAmount());
+                    Debug.send("heros-spawner", "spawner saving: [ID:{0}, Loc:<{1}>, Amount:{2}, Type:{3}]",
+                            spawner.getId(), LocationUtils.getLiteStringFromLocation(spawner.getLocation()), spawner.getAmount(), spawner.getEntityType().name());
+
                     if (spawner.isSaved()) {
                         preparedStatement = connection.prepareStatement(
-                                notes.update(new String[] { "AMOUNT" } , new Object[] {spawner.getAmount()}, "ID", spawner.getAmount())
+                                notes.update(new String[] { "AMOUNT" } , new Object[] {spawner.getAmount()}, "ID", spawner.getId())
                         );
                     } else {
                         preparedStatement = connection.prepareStatement(
@@ -201,6 +234,12 @@ public class SpawnerHandler {
                     preparedStatement.executeUpdate();
                 }
 
+                for (Integer id : toRemove) {
+                    preparedStatement = connection.prepareStatement(
+                            "DELETE FROM " + notes.getTable() + " WHERE ID = "+id+";"
+                    );
+                    preparedStatement.executeUpdate();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
