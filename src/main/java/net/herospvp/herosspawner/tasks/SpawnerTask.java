@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomEntity;
 import net.herospvp.herosspawner.objects.CustomSpawner;
-import net.prosavage.factionsx.persist.data.Factions;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -49,7 +49,7 @@ public class SpawnerTask extends BukkitRunnable {
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (CustomEntity customEntity : toSpawn) {
                 LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
-                entity.setCustomName("x" + customEntity.getAmount());
+                entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());
                 entity.setCustomNameVisible(true);
                 entity.setHealth(2);
                 entity.setFireTicks(80);

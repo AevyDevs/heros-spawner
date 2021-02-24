@@ -1,11 +1,12 @@
 package net.herospvp.herosspawner.listeners;
 
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
-import net.prosavage.factionsx.core.FPlayer;
-import net.prosavage.factionsx.core.Faction;
-import net.prosavage.factionsx.manager.PlayerManager;
-import net.prosavage.factionsx.persist.data.Players;
+import net.herospvp.herosspawner.objects.Collector;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +26,7 @@ public class CollectorListener implements Listener {
 
     @EventHandler
     public void on(PlayerJoinEvent event) {
-        FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(event.getPlayer().getUniqueId());
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(event.getPlayer());
         if (fPlayer.getFaction().isWilderness()) return;
 
         Faction faction = fPlayer.getFaction();
@@ -45,11 +46,25 @@ public class CollectorListener implements Listener {
             ItemStack item = event.getCurrentItem();
             if (item == null) return;
 
-            if (item.getType() == Material.STAINED_GLASS_PANE) return;
-            if (item.getType() == Material.HOPPER) return;
-            if (item.getType() == Material.TNT) return;
+            Collector collector = plugin.getCollectorHandler()
+                    .getCollector(FPlayers.getInstance().getByPlayer((Player) event.getWhoClicked()).getFaction().getId());
 
-            plugin.getCollectorHandler().getCollector(PlayerManager.INSTANCE.getFPlayer(event.getWhoClicked().getUniqueId()).getFaction().getId()).sell(item.getType());
+            Player player = (Player) event.getWhoClicked();
+            switch (item.getType()) {
+                case STAINED_GLASS_PANE: {
+                    return;
+                }
+                case HOPPER: {
+                    collector.sellAll(player);
+                    return;
+                }
+                case TNT: {
+                    collector.addTnt(player);
+                    return;
+                }
+            }
+
+            collector.sell(player, item.getType());
         }
     }
 

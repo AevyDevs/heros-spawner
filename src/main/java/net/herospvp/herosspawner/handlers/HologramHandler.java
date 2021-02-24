@@ -36,15 +36,15 @@ public class HologramHandler {
 
     public void createHologram(CustomSpawner spawner) {
         Hologram hologram = HologramsAPI.createHologram(plugin, spawner.getLocation().clone().add(0.5,1.5,0.5));
-        hologram.appendTextLine(StringUtils.capitalize(spawner.getEntityType().name()) + " x" + spawner.getAmount());
 
+        hologram.appendTextLine(StringUtils.c("&e&l「&r&e " + StringUtils.capitalize(spawner.getEntityType().name()) + " &6x" + spawner.getAmount() + "&e&l 」"));
         holograms.put(spawner.getId(), hologram);
     }
 
     public void updateHologram(CustomSpawner spawner) {
         Hologram hologram = holograms.get(spawner.getId());
 
-        hologram.appendTextLine(StringUtils.capitalize(spawner.getEntityType().name()) + " x" + spawner.getAmount());
+        hologram.appendTextLine(StringUtils.c("&e&l「&r&e " + StringUtils.capitalize(spawner.getEntityType().name()) + " &6x" + spawner.getAmount() + "&e&l 」"));
         hologram.removeLine(0);
     }
 

@@ -2,6 +2,7 @@ package net.herospvp.herosspawner.handlers;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.massivecraft.factions.*;
 import lombok.Getter;
 import net.herospvp.database.Musician;
 import net.herospvp.database.items.Instrument;
@@ -15,12 +16,6 @@ import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import net.herospvp.herosspawner.utils.FactionUtils;
-import net.prosavage.factionsx.core.CustomRole;
-import net.prosavage.factionsx.core.FPlayer;
-import net.prosavage.factionsx.core.Faction;
-import net.prosavage.factionsx.manager.GridManager;
-import net.prosavage.factionsx.manager.PlayerManager;
-import net.prosavage.factionsx.util.SpecialAction;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -73,7 +68,7 @@ public class SpawnerHandler {
     }
 
     public boolean breakSpawner(Player player, CustomSpawner spawner) {
-        FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(player.getUniqueId());
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
         if (!player.hasPermission("herospvp.admin")) {
             if (player.getItemInHand() == null || !(player.getItemInHand().getType() == Material.DIAMOND_PICKAXE && player.getItemInHand()
@@ -82,13 +77,13 @@ public class SpawnerHandler {
                 return false;
             }
 
-            Faction factionLoc = GridManager.INSTANCE.getFactionAt(spawner.getLocation().getChunk());
+            Faction factionLoc = Board.getInstance().getFactionAt(new FLocation(spawner.getLocation()));
             if (player.getGameMode() == GameMode.CREATIVE) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Non puoi rompere spawner in &ecreative mode&f!");
                 return false;
             }
 
-            if (factionLoc.isSystemFaction() || factionLoc.getId() != fPlayer.getFaction().getId()) {
+            if (factionLoc.isSystemFaction() || !factionLoc.getId().equals(fPlayer.getFaction().getId())) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Puoi rompere gli spawner solo nei claim della tua fazione!");
                 return false;
             }
@@ -140,13 +135,13 @@ public class SpawnerHandler {
     }
 
     public boolean place(Player player, ItemStack item, Block block) {
-        FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(player.getUniqueId());
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
         Debug.send("heros-spawner", "placing mobspawner [Player:{0}, Item:{1}, Loc<{2}>]", player.getName(), item.getType(),
                 LocationUtils.getLiteStringFromLocation(block.getLocation()));
 
         if (!player.hasPermission("herospvp.admin")) {
-            Faction factionLoc = GridManager.INSTANCE.getFactionAt(block.getChunk());
+            Faction factionLoc = Board.getInstance().getFactionAt(new FLocation(block.getLocation()));
             if (fPlayer.getFaction().isWilderness()) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere in una fazione per poter piazzare gli spawner!");
                 return false;
@@ -157,7 +152,7 @@ public class SpawnerHandler {
                 return false;
             }
 
-            if (factionLoc.isSystemFaction() || factionLoc.getId() != fPlayer.getFaction().getId()) {
+            if (factionLoc.isSystemFaction() || !factionLoc.getId().equals(fPlayer.getFaction().getId())) {
                 Message.sendMessage(player, MessageType.ERROR, "Spawner", "Puoi piazzare gli spawner solo nei claim della tua fazione!");
                 return false;
             }
@@ -173,7 +168,7 @@ public class SpawnerHandler {
         spawners.put(block.getLocation(), spawner);
         plugin.getHologramHandler().createHologram(spawner);
 
-        Debug.send("heros-spawner", "put in the map, contains: {0}", spawners.containsKey(block.getLocation()));;
+        Debug.send("heros-spawner", "put in the map, contains: {0}", spawners.containsKey(block.getLocation()));
         return true;
     }
 
@@ -229,7 +224,7 @@ public class SpawnerHandler {
                     int id = resultSet.getInt("ID");
                     if (id>maxId) maxId=id;
 
-                    long factionId = resultSet.getLong("FACTIONID");
+                    String factionId = resultSet.getLong("FACTIONID")+"";
                     EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
                     Integer amount = resultSet.getInt("AMOUNT");
                     Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));

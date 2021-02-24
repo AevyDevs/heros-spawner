@@ -1,18 +1,18 @@
 package net.herospvp.herosspawner.handlers;
 
 import com.google.common.collect.Maps;
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.Collector;
-import net.prosavage.factionsx.core.FPlayer;
-import net.prosavage.factionsx.core.Faction;
-import net.prosavage.factionsx.manager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 
 public class CollectorHandler {
-    private Map<Long, Collector> collectors;
+    private Map<String, Collector> collectors;
     private HerosSpawner plugin;
 
     public CollectorHandler(HerosSpawner plugin) {
@@ -22,13 +22,13 @@ public class CollectorHandler {
         this.loadAll();
     }
 
-    public Collector getCollector(long factionId) {
+    public Collector getCollector(String factionId) {
         return collectors.get(factionId);
     }
 
     public void loadAll() {
         for (Player players : Bukkit.getOnlinePlayers()) {
-            FPlayer fPlayer = PlayerManager.INSTANCE.getFPlayer(players.getUniqueId());
+            FPlayer fPlayer = FPlayers.getInstance().getByPlayer(players);
             if (fPlayer.getFaction().isWilderness()) continue;
 
             Faction faction = fPlayer.getFaction();
@@ -37,11 +37,11 @@ public class CollectorHandler {
         }
     }
 
-    public void load(long factionId) {
+    public void load(String factionId) {
         collectors.put(factionId, new Collector(factionId));
     }
 
-    public void remove(long factionId) {
+    public void remove(String factionId) {
         collectors.remove(factionId);
     }
 }

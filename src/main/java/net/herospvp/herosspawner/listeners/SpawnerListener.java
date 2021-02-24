@@ -1,6 +1,8 @@
 package net.herospvp.herosspawner.listeners;
 
 import net.herospvp.heroscore.utils.strings.Debug;
+import net.herospvp.heroscore.utils.strings.message.Message;
+import net.herospvp.heroscore.utils.strings.message.MessageType;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
@@ -64,6 +66,11 @@ public class SpawnerListener implements Listener {
         if (event.getBlock().getType() != Material.MOB_SPAWNER) return;
 
         CustomSpawner spawner = plugin.getSpawnerHandler().getSpawner(event.getBlock());
+        if (spawner == null) {
+            Message.sendMessage(event.getPlayer(), MessageType.WARNING, "Spawner", "Questo spawner è corrotto, se pensi sia un errore contatta un amministratore");
+            return;
+        }
+
         if (!plugin.getSpawnerHandler().breakSpawner(event.getPlayer(), spawner)) {
             event.setCancelled(true);
         }

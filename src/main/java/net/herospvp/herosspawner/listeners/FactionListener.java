@@ -1,9 +1,11 @@
 package net.herospvp.herosspawner.listeners;
 
+import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.event.FactionCreateEvent;
+import com.massivecraft.factions.event.FactionDisbandEvent;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
-import net.prosavage.factionsx.event.FactionCreateEvent;
-import net.prosavage.factionsx.event.FactionDisbandEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -18,7 +20,7 @@ public class FactionListener implements Listener {
     @EventHandler
     public void on(FactionDisbandEvent event) {
         for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
-            if (spawner.getFactionId() == event.getFaction().getId()) {
+            if ((spawner.getFactionId() + "").equals(event.getFaction().getId())) {
                 plugin.getSpawnerHandler().breakSpawner(spawner);
             }
         }
@@ -28,7 +30,10 @@ public class FactionListener implements Listener {
 
     @EventHandler
     public void on(FactionCreateEvent event) {
-        plugin.getCollectorHandler().load(event.getFaction().getId());
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            plugin.getCollectorHandler().load(Factions.getInstance().getByTag(event.getFactionTag()).getId());
+        }, 10);
+
     }
 
 

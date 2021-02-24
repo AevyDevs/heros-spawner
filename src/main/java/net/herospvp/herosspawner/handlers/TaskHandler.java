@@ -10,7 +10,7 @@ public class TaskHandler {
     public TaskHandler(HerosSpawner plugin) {
         this.plugin = plugin;
 
-        new SaveTask(plugin).runTaskTimerAsynchronously(plugin, 20 , 20*60*3);
-        new SpawnerTask(plugin).runTaskTimerAsynchronously(plugin, 20, 20*3);
+        new SaveTask(plugin).runTaskTimerAsynchronously(plugin, 20 , 20*60*10);
+        new SpawnerTask(plugin).runTaskTimerAsynchronously(plugin, 20, 20*10);
     }
 }
