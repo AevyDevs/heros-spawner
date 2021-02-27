@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
+import java.util.Arrays;
+
 @Getter
 public enum SpawnerDrop {
     ZOMBIE(Material.ROTTEN_FLESH, EntityType.ZOMBIE, 0.5),

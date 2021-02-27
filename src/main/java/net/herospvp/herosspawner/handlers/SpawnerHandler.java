@@ -225,7 +225,7 @@ public class SpawnerHandler {
                     int id = resultSet.getInt("ID");
                     if (id>maxId) maxId=id;
 
-                    String factionId = resultSet.getLong("FACTIONID")+"";
+                    String factionId = String.valueOf(resultSet.getLong("FACTIONID"));
                     EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
                     Integer amount = resultSet.getInt("AMOUNT");
                     Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));

@@ -1,5 +1,6 @@
 package net.herospvp.herosspawner.listeners;
 
+import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.event.FactionCreateEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
@@ -19,13 +20,24 @@ public class FactionListener implements Listener {
 
     @EventHandler
     public void on(FactionDisbandEvent event) {
+        Faction faction = event.getFaction();
+
+        // TODO testing
+        plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
+            if (spawner.getFactionId().equals(faction.getId())) {
+                plugin.getSpawnerHandler().breakSpawner(spawner);
+            }
+        });
+
+        /*
         for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
-            if ((spawner.getFactionId() + "").equals(event.getFaction().getId())) {
+            if (spawner.getFactionId().equals(faction.getId())) {
                 plugin.getSpawnerHandler().breakSpawner(spawner);
             }
         }
+        */
 
-        plugin.getCollectorHandler().remove(event.getFaction().getId());
+        plugin.getCollectorHandler().remove(faction.getId());
     }
 
     @EventHandler

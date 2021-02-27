@@ -5,15 +5,12 @@ import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.Collector;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class CollectorListener implements Listener {

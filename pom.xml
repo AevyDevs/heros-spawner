@@ -6,7 +6,7 @@
 
     <groupId>net.herospvp</groupId>
     <artifactId>heros-spawner</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>heros-spawner</name>
@@ -89,13 +89,13 @@
         <dependency>
             <groupId>com.github.HerosDevs</groupId>
             <artifactId>database-lib</artifactId>
-            <version>1.4.2-SNAPSHOT</version>
+            <version>1.4.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.HerosDevs</groupId>
             <artifactId>heros-core</artifactId>
-            <version>1.1.17-SNAPSHOT</version>
+            <version>1.1.18-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 

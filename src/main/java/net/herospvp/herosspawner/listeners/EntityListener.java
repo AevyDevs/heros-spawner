@@ -5,12 +5,10 @@ import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.SpawnerDrop;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 
 public class EntityListener implements Listener {
     private HerosSpawner plugin;

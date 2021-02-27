@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.integration.Econ;
-import com.sk89q.commandbook.bans.Ban;
 import net.herospvp.heroscore.utils.items.ItemBuilder;
 import net.herospvp.heroscore.utils.strings.StringUtils;
 import net.herospvp.heroscore.utils.strings.message.Message;
@@ -15,7 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 
 public class Collector {
@@ -50,12 +49,26 @@ public class Collector {
         Faction faction = Factions.getInstance().getFactionById(factionId+"");
 
         final double[] total = {0};
+
+        // TODO testing
+        drops.entrySet().parallelStream().forEach(entry -> {
+            Material key = entry.getKey();
+            Double value = entry.getValue();
+
+            if (key != Material.TNT) {
+                Econ.deposit(faction.getAccountId(), (SpawnerDrop.getPrice(key) * value));
+                total[0] += value;
+            }
+        });
+
+        /*
         drops.forEach(((material, money) -> {
             if (material != Material.TNT) {
                 Econ.deposit(faction.getAccountId(), (SpawnerDrop.getPrice(material) * money));
                 total[0] += money;
             }
         }));
+        */
 
         if (total[0] == 0) return;
 
@@ -79,7 +92,7 @@ public class Collector {
         int amount = drops.get(Material.TNT).intValue();
         if (amount == 0) return;
 
-        Factions.getInstance().getFactionById(factionId+"").addTnt(amount);
+        Factions.getInstance().getFactionById(String.valueOf(factionId)).addTnt(amount);
         removeDrop(Material.TNT);
         updateInventory();
 
@@ -92,10 +105,20 @@ public class Collector {
     }
 
     private void clear(boolean withTnt) {
+
+        // TODO testing
+        Arrays.stream(SpawnerDrop.values()).parallel().forEach(value -> {
+            if (!withTnt && value.getDropType() != Material.TNT) {
+                drops.put(value.getDropType(), (double) 0);
+            }
+        });
+
+        /*
         for (SpawnerDrop value : SpawnerDrop.values()) {
             if (!withTnt) if (value.getDropType() == Material.TNT) continue;
             drops.put(value.getDropType(), (double) 0);
         }
+        */
     }
 
     private void createInventory() {

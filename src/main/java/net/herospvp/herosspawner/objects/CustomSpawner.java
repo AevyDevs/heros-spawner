@@ -3,7 +3,6 @@ package net.herospvp.herosspawner.objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 
 @Getter @Setter

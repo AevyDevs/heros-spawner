@@ -2,6 +2,7 @@ package net.herospvp.herosspawner;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
+import net.herospvp.database.DatabaseLib;
 import net.herospvp.database.lib.Director;
 import net.herospvp.database.lib.Musician;
 import net.herospvp.database.lib.items.Instrument;
@@ -15,18 +16,8 @@ import net.herospvp.herosspawner.listeners.CollectorListener;
 import net.herospvp.herosspawner.listeners.EntityListener;
 import net.herospvp.herosspawner.listeners.FactionListener;
 import net.herospvp.herosspawner.listeners.SpawnerListener;
-import net.herospvp.herosspawner.objects.Collector;
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Getter
 public final class HerosSpawner extends JavaPlugin implements Listener{
@@ -76,7 +67,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
      * Initialize the database with values in the config.yml
      */
     private void initializeDatabase() {
-        this.director = new Director();
+        this.director = getPlugin(DatabaseLib.class).getDirector();
 
         String password = getConfig().getString("db.password");
         Instrument instrument = new Instrument(
