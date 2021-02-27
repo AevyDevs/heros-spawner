@@ -1,18 +1,17 @@
 package net.herospvp.herosspawner.commands;
 
-import net.herospvp.heroscore.utils.CommandHandler;
+import net.herospvp.heroscore.utils.CommandsHandler;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SpawnerCommand extends CommandHandler {
+public class SpawnerCommand extends CommandsHandler {
     private final HerosSpawner plugin;
 
     public SpawnerCommand(HerosSpawner plugin) {

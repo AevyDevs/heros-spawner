@@ -3,11 +3,9 @@ package net.herospvp.herosspawner.handlers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.massivecraft.factions.*;
-import lombok.Getter;
-import net.herospvp.database.Musician;
-import net.herospvp.database.items.Instrument;
-import net.herospvp.database.items.Notes;
-import net.herospvp.database.items.Papers;
+import net.herospvp.database.lib.Musician;
+import net.herospvp.database.lib.items.Notes;
+import net.herospvp.database.lib.items.Papers;
 import net.herospvp.heroscore.utils.LocationUtils;
 import net.herospvp.heroscore.utils.strings.Debug;
 import net.herospvp.heroscore.utils.strings.message.Message;
@@ -16,7 +14,9 @@ import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import net.herospvp.herosspawner.utils.FactionUtils;
-import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
@@ -24,10 +24,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class SpawnerHandler {
@@ -50,7 +51,7 @@ public class SpawnerHandler {
         this.musician = plugin.getMusician();
         this.notes = new Notes("spawners");
 
-        this.musician.update(startup());
+        this.musician.offer(startup());
     }
 
     public Collection<CustomSpawner> getSpawners() {
@@ -173,7 +174,7 @@ public class SpawnerHandler {
     }
 
     public void purge() {
-        musician.update(((connection, instrument) -> {
+        musician.offer(((connection, instrument) -> {
             spawners.clear();
             plugin.getHologramHandler().purge();
 
@@ -208,11 +209,11 @@ public class SpawnerHandler {
     }
 
     public void save() {
-        musician.update(saveAll());
+        musician.offer(saveAll());
     }
 
     public void loadAll(Consumer<Collection<CustomSpawner>> result) {
-        this.musician.update((connection, instrument) -> {
+        this.musician.offer((connection, instrument) -> {
             PreparedStatement preparedStatement = null;
             try {
                 preparedStatement = connection.prepareStatement(

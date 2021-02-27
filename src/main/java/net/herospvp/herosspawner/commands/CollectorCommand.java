@@ -2,19 +2,18 @@ package net.herospvp.herosspawner.commands;
 
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
-import net.herospvp.heroscore.utils.CommandHandler;
+import net.herospvp.heroscore.utils.CommandsHandler;
 import net.herospvp.heroscore.utils.strings.message.Message;
 import net.herospvp.heroscore.utils.strings.message.MessageType;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.utils.FactionUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CollectorCommand extends CommandHandler {
+public class CollectorCommand extends CommandsHandler {
     private final HerosSpawner plugin;
 
     public CollectorCommand(HerosSpawner plugin) {

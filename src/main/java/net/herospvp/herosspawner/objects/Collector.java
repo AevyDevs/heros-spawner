@@ -36,6 +36,8 @@ public class Collector {
         Faction faction = Factions.getInstance().getFactionById(factionId+"");
 
         double amount = SpawnerDrop.getPrice(material)*drops.get(material);
+        if (amount == 0) return;
+
         Econ.deposit(faction.getAccountId(), amount);
 
         Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai aggiunto &6$&e{0} &falla banca della fazione", amount+"");
@@ -75,6 +77,7 @@ public class Collector {
 
     public void addTnt(Player player) {
         int amount = drops.get(Material.TNT).intValue();
+        if (amount == 0) return;
 
         Factions.getInstance().getFactionById(factionId+"").addTnt(amount);
         removeDrop(Material.TNT);

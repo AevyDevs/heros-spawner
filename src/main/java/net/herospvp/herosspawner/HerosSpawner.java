@@ -2,8 +2,9 @@ package net.herospvp.herosspawner;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
-import net.herospvp.database.Director;
-import net.herospvp.database.Musician;
+import net.herospvp.database.lib.Director;
+import net.herospvp.database.lib.Musician;
+import net.herospvp.database.lib.items.Instrument;
 import net.herospvp.herosspawner.commands.CollectorCommand;
 import net.herospvp.herosspawner.commands.SpawnerCommand;
 import net.herospvp.herosspawner.handlers.CollectorHandler;
@@ -78,14 +79,12 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         this.director = new Director();
 
         String password = getConfig().getString("db.password");
-        net.herospvp.database.items.Instrument instrument = new net.herospvp.database.items.Instrument(
-                null, getConfig().getString("db.ip"), getConfig().getString("db.port"),
+        Instrument instrument = new Instrument(
+                getConfig().getString("db.ip"), getConfig().getString("db.port"),
                 getConfig().getString("db.database"), getConfig().getString("db.user"), password.equals("null") ? null : password,
                 getConfig().getString("db.url"), getConfig().getString("db.driver"), null, true,
                 getConfig().getInt("db.max-pool-size")
         );
-        instrument.assemble();
-
         this.director.addInstrument("heros-spawners", instrument);
         this.musician = new Musician(director, instrument, getConfig().getBoolean("db.debug"));
     }

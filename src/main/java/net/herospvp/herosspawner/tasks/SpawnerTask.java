@@ -1,7 +1,6 @@
 package net.herospvp.herosspawner.tasks;
 
 import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomEntity;
 import net.herospvp.herosspawner.objects.CustomSpawner;
@@ -13,7 +12,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,7 +26,11 @@ public class SpawnerTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (plugin.getSpawnerHandler().getSpawners().isEmpty()) return;
+
         for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
+            if (spawner == null) continue;
+
             Collection<Entity> entities = spawner.getLocation().getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
             if (entities == null) continue;
 

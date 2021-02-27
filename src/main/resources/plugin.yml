@@ -4,6 +4,8 @@ main: net.herospvp.herosspawner.HerosSpawner
 authors: [ Niketion ]
 softdepend:
   - HolographicDisplays
+  - database-lib
+  - heros-core
 commands:
   spawner:
   collector:
