@@ -10,4 +10,12 @@ public class CustomEntity {
     private final EntityType type;
     private final int amount;
     private final Location location;
+
+    @Override
+    public String toString() {
+        return "CustomEntity{" +
+                "type=" + type +
+                ", amount=" + amount +
+                '}';
+    }
 }
