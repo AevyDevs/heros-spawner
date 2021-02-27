@@ -244,45 +244,59 @@ public class SpawnerHandler {
 
     private Papers saveAll() {
         return (connection, instrument) -> {
-            PreparedStatement preparedStatement = null;
+            if (spawners.isEmpty()) return;
 
+            PreparedStatement updateStatement = null, insertStatement = null, deleteStatement = null;
             try {
-                if (spawners.isEmpty()) return;
+
+                insertStatement = connection.prepareStatement(
+                        notes.pendingInsert(new String[]{ "ID", "FACTIONID", "ENTITY", "AMOUNT", "LOCATION" })
+                );
+
+                updateStatement = connection.prepareStatement(
+                        notes.pendingUpdate(new String[] { "AMOUNT" } , "ID")
+                );
+
+                deleteStatement = connection.prepareStatement(
+                        "DELETE FROM " + notes.getTable() + " WHERE ID = ?;"
+                );
 
                 for (CustomSpawner spawner : spawners.values()) {
+
                     Debug.send("heros-spawner", "spawner saving: [ID:{0}, Loc:<{1}>, Amount:{2}, Type:{3}]",
                             spawner.getId(), LocationUtils.getLiteStringFromLocation(spawner.getLocation()), spawner.getAmount(), spawner.getEntityType().name());
 
                     if (spawner.isSaved()) {
-                        preparedStatement = connection.prepareStatement(
-                                notes.update(new String[] { "AMOUNT" } , new Object[] {spawner.getAmount()}, "ID", spawner.getId())
-                        );
+                        updateStatement.setInt(1, spawner.getAmount());
+                        updateStatement.setInt(2, spawner.getId());
+                        updateStatement.addBatch();
                     } else {
-                        preparedStatement = connection.prepareStatement(
-                                notes.insert(new String[]{ "ID", "FACTIONID", "ENTITY", "AMOUNT", "LOCATION" },
-                                        new Object[]{
-                                                spawner.getId(),
-                                                spawner.getFactionId(),
-                                                spawner.getEntityType().name(),
-                                                spawner.getAmount(),
-                                                LocationUtils.getLiteStringFromLocation(spawner.getLocation())
-                                })
-                        );
+                        insertStatement.setInt(1, spawner.getId());
+                        insertStatement.setString(2, spawner.getFactionId());
+                        insertStatement.setString(3, spawner.getEntityType().name());
+                        insertStatement.setInt(4, spawner.getAmount());
+                        insertStatement.setString(5, LocationUtils.getLiteStringFromLocation(spawner.getLocation()));
                         spawner.setSaved(true);
+                        insertStatement.addBatch();
                     }
-                    preparedStatement.executeUpdate();
+
                 }
 
                 for (Integer id : toRemove) {
-                    preparedStatement = connection.prepareStatement(
-                            "DELETE FROM " + notes.getTable() + " WHERE ID = "+id+";"
-                    );
-                    preparedStatement.executeUpdate();
+                    deleteStatement.setInt(1, id);
+                    deleteStatement.addBatch();
                 }
+
+                deleteStatement.executeBatch();
+                updateStatement.executeBatch();
+                insertStatement.executeBatch();
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                instrument.close(preparedStatement);
+                instrument.close(deleteStatement);
+                instrument.close(updateStatement);
+                instrument.close(insertStatement);
             }
         };
     }
