@@ -1,26 +1,29 @@
 package net.herospvp.herosspawner.tasks;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomEntity;
-import org.bukkit.ChatColor;
+import net.herospvp.herosspawner.objects.SpawnEntity;
+import net.herospvp.herosspawner.utils.WorkloadThread;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.List;
 import java.util.Queue;
 
 public class SpawnerTask extends BukkitRunnable {
     private final HerosSpawner plugin;
-    private final List<CustomEntity> toSpawn;
+    private final ArrayDeque<SpawnEntity> toSpawn;
+    private final WorkloadThread thread;
 
     public SpawnerTask(HerosSpawner plugin) {
         this.plugin = plugin;
-        this.toSpawn = Lists.newArrayList();
+        this.toSpawn = Queues.newArrayDeque();
+        this.thread = new WorkloadThread();
     }
 
     @Override
@@ -44,48 +47,11 @@ public class SpawnerTask extends BukkitRunnable {
 
             if (!found) return;
             Location location = spawner.getLocation().clone().add(1.5, 0, 1.5);
-            toSpawn.add(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location));
+            toSpawn.add(new SpawnEntity(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location)));
         });
 
-        int moments = toSpawn.size()/10+1;
-        final int[] count = {0};
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (toSpawn.isEmpty()) {
-                    cancel();
-                    return;
-                }
-
-                if (count[0] == 10) {
-                    cancel();
-                    return;
-                }
-
-                for (int i=0; i<moments; i++) {
-                    if (toSpawn.isEmpty()) {
-                        cancel();
-                        return;
-                    }
-
-                    CustomEntity customEntity = toSpawn.get(0);
-                    if (customEntity == null || customEntity.getLocation() == null) continue;
-
-                    LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
-                    entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());
-                    entity.setCustomNameVisible(true);
-                    entity.setHealth(2);
-                    entity.setFireTicks(80);
-
-                    toSpawn.remove(0);
-                }
-
-                count[0]++;
-            }
-        }.runTaskTimer(plugin, 2, 5);
-
-
+        thread.setWorkloadDeque(toSpawn);
+        Bukkit.getScheduler().runTask(plugin, thread);
         /*Bukkit.getScheduler().runTask(plugin, () -> {
             for (CustomEntity customEntity : toSpawn) {
                 LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
