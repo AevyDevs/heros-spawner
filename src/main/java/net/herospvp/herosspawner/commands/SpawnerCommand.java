@@ -2,8 +2,10 @@ package net.herospvp.herosspawner.commands;
 
 import net.herospvp.heroscore.utils.CommandsHandler;
 import net.herospvp.herosspawner.HerosSpawner;
+import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,20 +17,36 @@ public class SpawnerCommand extends CommandsHandler {
     private final HerosSpawner plugin;
 
     public SpawnerCommand(HerosSpawner plugin) {
-        super(plugin, "herospvp.admin", "spawner", false, Collections.singletonList("/spawner [purge/<type>] <player> <amount>"), false);
+        super(plugin, "herospvp.admin", "spawner", false, Collections.singletonList("/spawner [checks/purge/<type>] <player> <amount>"), false);
         this.plugin = plugin;
     }
 
     @Override
     public boolean command(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("purge")) {
-                plugin.getSpawnerHandler().purge();
-                return true;
+            switch (args[0].toUpperCase()) {
+                case "purge": {
+                    plugin.getSpawnerHandler().purge();
+                    return true;
+                }
+                case "checks": {
+                    for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
+                        if (spawner== null) continue;
+
+                        if (spawner.getLocation().getBlock().getType() != Material.MOB_SPAWNER) {
+                            sender.sendMessage("Trovato uno spawner nullo! ID " + spawner.getId() + " rimosso!");
+                            plugin.getSpawnerHandler().breakSpawner(spawner);
+                        }
+                    }
+                    return true;
+                }
+                default: {
+                    return false;
+                }
             }
         }
 
-        if (!(args.length > 2)) {
+        if (args.length <= 2) {
             return false;
         }
 

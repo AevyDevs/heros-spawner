@@ -4,6 +4,7 @@ import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
+import net.herospvp.herosspawner.objects.Collector;
 import net.herospvp.herosspawner.objects.SpawnerDrop;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -29,6 +30,9 @@ public class EntityListener implements Listener {
         event.getDrops().clear();
 
         int amount = Integer.parseInt(ChatColor.stripColor(event.getEntity().getCustomName()).replace("x", ""));
-        plugin.getCollectorHandler().getCollector(faction.getId()).addDrop(SpawnerDrop.getDrop(event.getEntityType()), amount);
+
+        Collector collector = plugin.getCollectorHandler().getCollector(faction.getId());
+        if (collector == null) return;
+        collector.addDrop(SpawnerDrop.getDrop(event.getEntityType()), amount);
     }
 }
