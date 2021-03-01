@@ -15,6 +15,7 @@ import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import net.herospvp.herosspawner.utils.FactionUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -210,33 +211,36 @@ public class SpawnerHandler {
     }
 
     public void loadAll(Consumer<Collection<CustomSpawner>> result) {
-        this.musician.offer((connection, instrument) -> {
-            PreparedStatement preparedStatement = null;
-            try {
-                preparedStatement = connection.prepareStatement(
-                        notes.selectAll()
-                );
-                ResultSet resultSet = preparedStatement.executeQuery();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            this.musician.offer((connection, instrument) -> {
+                PreparedStatement preparedStatement = null;
+                try {
+                    preparedStatement = connection.prepareStatement(
+                            notes.selectAll()
+                    );
+                    ResultSet resultSet = preparedStatement.executeQuery();
 
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("ID");
-                    if (id > maxId) maxId = id;
+                    while (resultSet.next()) {
+                        int id = resultSet.getInt("ID");
+                        if (id > maxId) maxId = id;
 
-                    String factionId = String.valueOf(resultSet.getLong("FACTIONID"));
-                    EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
-                    Integer amount = resultSet.getInt("AMOUNT");
-                    Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));
+                        String factionId = String.valueOf(resultSet.getLong("FACTIONID"));
+                        EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
+                        Integer amount = resultSet.getInt("AMOUNT");
+                        Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));
 
-                    CustomSpawner spawner = new CustomSpawner(id, factionId, type, amount, location, true);
-                    spawners.put(location, spawner);
+                        CustomSpawner spawner = new CustomSpawner(id, factionId, type, amount, location, true);
+                        Debug.send("heros-spawner", "loading: " + spawner.getId());
+                        spawners.put(location, spawner);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    instrument.close(preparedStatement);
+                    result.accept(spawners.values());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                instrument.close(preparedStatement);
-                result.accept(spawners.values());
-            }
-        });
+            });
+        }, 20);
     }
 
     @SneakyThrows

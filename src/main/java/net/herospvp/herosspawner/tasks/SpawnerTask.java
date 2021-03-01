@@ -28,7 +28,7 @@ public class SpawnerTask extends BukkitRunnable {
         if (plugin.getSpawnerHandler().getSpawners().isEmpty()) return;
 
         plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
-            if (spawner == null) return;
+            if (spawner == null || spawner.getLocation() == null || spawner.getLocation().getWorld() == null) return;
 
             Collection<Entity> entities = spawner.getLocation().getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
             if (entities == null) return;
