@@ -10,6 +10,6 @@ public class SaveTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        plugin.getSpawnerHandler().save();
+        plugin.getSpawnerHandler().saveAll();
     }
 }

@@ -3,6 +3,7 @@ package net.herospvp.herosspawner.handlers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.massivecraft.factions.*;
+import lombok.SneakyThrows;
 import net.herospvp.database.lib.Musician;
 import net.herospvp.database.lib.items.Notes;
 import net.herospvp.database.lib.items.Papers;
@@ -14,7 +15,6 @@ import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import net.herospvp.herosspawner.utils.FactionUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -209,44 +209,39 @@ public class SpawnerHandler {
         };
     }
 
-    public void save() {
-        musician.offer(saveAll());
-    }
-
     public void loadAll(Consumer<Collection<CustomSpawner>> result) {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> { // TODO: SCHIF FARE QUALCOSA DI MEGLIO
-            this.musician.offer((connection, instrument) -> {
-                PreparedStatement preparedStatement = null;
-                try {
-                    preparedStatement = connection.prepareStatement(
-                            notes.selectAll()
-                    );
-                    ResultSet resultSet = preparedStatement.executeQuery();
+        this.musician.offer((connection, instrument) -> {
+            PreparedStatement preparedStatement = null;
+            try {
+                preparedStatement = connection.prepareStatement(
+                        notes.selectAll()
+                );
+                ResultSet resultSet = preparedStatement.executeQuery();
 
-                    while (resultSet.next()) {
-                        int id = resultSet.getInt("ID");
-                        if (id > maxId) maxId = id;
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("ID");
+                    if (id > maxId) maxId = id;
 
-                        String factionId = String.valueOf(resultSet.getLong("FACTIONID"));
-                        EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
-                        Integer amount = resultSet.getInt("AMOUNT");
-                        Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));
+                    String factionId = String.valueOf(resultSet.getLong("FACTIONID"));
+                    EntityType type = EntityType.valueOf(resultSet.getString("ENTITY"));
+                    Integer amount = resultSet.getInt("AMOUNT");
+                    Location location = LocationUtils.getLiteLocationFromString(resultSet.getString("LOCATION"));
 
-                        CustomSpawner spawner = new CustomSpawner(id, factionId, type, amount, location, true);
-                        spawners.put(location, spawner);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    instrument.close(preparedStatement);
-                    result.accept(spawners.values());
+                    CustomSpawner spawner = new CustomSpawner(id, factionId, type, amount, location, true);
+                    spawners.put(location, spawner);
                 }
-            });
-        }, 20);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                instrument.close(preparedStatement);
+                result.accept(spawners.values());
+            }
+        });
     }
 
-    private Papers saveAll() {
-        return (connection, instrument) -> {
+    @SneakyThrows
+    public void saveAll() {
+        musician.offer((connection, instrument) -> {
             if (spawners.isEmpty()) return;
 
             PreparedStatement updateStatement = null, insertStatement = null, deleteStatement = null;
@@ -301,6 +296,10 @@ public class SpawnerHandler {
                 instrument.close(updateStatement);
                 instrument.close(insertStatement);
             }
-        };
+        });
+
+        while (!musician.getBlockingQueue().isEmpty()) {
+            Thread.sleep(50);
+        }
     }
 }

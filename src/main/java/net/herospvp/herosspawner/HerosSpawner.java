@@ -62,7 +62,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
     @SneakyThrows
     @Override
     public void onDisable() {
-        spawnerHandler.save();
+        spawnerHandler.saveAll();
     }
 
     /**
