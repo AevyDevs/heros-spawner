@@ -13,10 +13,7 @@ import net.herospvp.herosspawner.handlers.CollectorHandler;
 import net.herospvp.herosspawner.handlers.HologramHandler;
 import net.herospvp.herosspawner.handlers.SpawnerHandler;
 import net.herospvp.herosspawner.handlers.TaskHandler;
-import net.herospvp.herosspawner.listeners.CollectorListener;
-import net.herospvp.herosspawner.listeners.EntityListener;
-import net.herospvp.herosspawner.listeners.FactionListener;
-import net.herospvp.herosspawner.listeners.SpawnerListener;
+import net.herospvp.herosspawner.listeners.*;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -57,6 +54,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         new FactionListener(this);
         new EntityListener(this);
         new CollectorListener(this);
+        new ExplosionListener(this);
     }
 
     @SneakyThrows

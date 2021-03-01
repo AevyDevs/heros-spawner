@@ -7,7 +7,6 @@ import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -17,7 +16,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class SpawnerListener implements Listener {
@@ -47,15 +45,6 @@ public class SpawnerListener implements Listener {
     @EventHandler
     public void on(CreatureSpawnEvent event) {
         if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void on(EntityExplodeEvent event) {
-        for (Block block : event.blockList()) {
-            CustomSpawner spawner = plugin.getSpawnerHandler().getSpawner(block);
-            if (spawner == null) continue;
-            plugin.getSpawnerHandler().breakSpawner(spawner);
-        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
