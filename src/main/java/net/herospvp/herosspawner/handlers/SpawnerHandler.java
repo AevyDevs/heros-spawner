@@ -197,9 +197,9 @@ public class SpawnerHandler {
             PreparedStatement preparedStatement = null;
             try {
                 preparedStatement = connection.prepareStatement(
-                        notes.createTable(new String[]{"ID int NOT NULL", "FACTIONID long NOT NULL", "ENTITY varchar(20)", "AMOUNT int", "LOCATION varchar(255) NOT NULL"})
+                        notes.createTable(new String[]{"ID int NOT NULL", "FACTIONID long NOT NULL", "ENTITY varchar(20) NOT NULL", "AMOUNT int NOT NULL", "LOCATION varchar(255) NOT NULL"})
                 );
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

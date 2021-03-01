@@ -16,6 +16,7 @@ import net.herospvp.herosspawner.listeners.CollectorListener;
 import net.herospvp.herosspawner.listeners.EntityListener;
 import net.herospvp.herosspawner.listeners.FactionListener;
 import net.herospvp.herosspawner.listeners.SpawnerListener;
+import net.herospvp.herosspawner.utils.WorkloadManager;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,6 +31,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
     private HologramHandler hologramHandler;
     private SpawnerHandler spawnerHandler;
     private CollectorHandler collectorHandler;
+    private WorkloadManager workloadManager;
 
     private WorldGuardPlugin worldGuardPlugin;
 
@@ -48,6 +50,8 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         spawnerHandler.loadAll(result -> {
             this.hologramHandler.load(result);
         });
+        this.workloadManager = new WorkloadManager(this);
+        this.workloadManager.start();
 
         new SpawnerCommand(this);
         new CollectorCommand(this);

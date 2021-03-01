@@ -1,12 +1,12 @@
 package net.herospvp.herosspawner.objects;
 
 import lombok.AllArgsConstructor;
-import net.herospvp.herosspawner.utils.Workload;
+import net.herospvp.herosspawner.utils.WorkloadTask;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 
 @AllArgsConstructor
-public class SpawnEntity implements Workload {
+public class SpawnEntity implements WorkloadTask {
     private final CustomEntity customEntity;
 
     @Override
@@ -16,5 +16,10 @@ public class SpawnEntity implements Workload {
         entity.setCustomNameVisible(true);
         entity.setHealth(2);
         entity.setFireTicks(80);
+    }
+
+    @Override
+    public String toString() {
+        return "" + customEntity.getType() + " x" + customEntity.getAmount();
     }
 }

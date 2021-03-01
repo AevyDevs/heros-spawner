@@ -4,26 +4,26 @@ import com.google.common.collect.Queues;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.CustomEntity;
 import net.herospvp.herosspawner.objects.SpawnEntity;
-import net.herospvp.herosspawner.utils.WorkloadThread;
-import org.bukkit.Bukkit;
+import net.herospvp.herosspawner.utils.Workload;
+import net.herospvp.herosspawner.utils.WorkloadManager;
+import net.herospvp.herosspawner.utils.WorkloadTask;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Queue;
 
 public class SpawnerTask extends BukkitRunnable {
     private final HerosSpawner plugin;
-    private final ArrayDeque<SpawnEntity> toSpawn;
-    private final WorkloadThread thread;
+    private final Queue<WorkloadTask> toSpawn;
+    private final WorkloadManager thread;
 
     public SpawnerTask(HerosSpawner plugin) {
         this.plugin = plugin;
-        this.toSpawn = Queues.newArrayDeque();
-        this.thread = new WorkloadThread();
+        this.toSpawn = Queues.newConcurrentLinkedQueue();
+        this.thread = new WorkloadManager(plugin);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class SpawnerTask extends BukkitRunnable {
         if (plugin.getSpawnerHandler().getSpawners().isEmpty()) return;
 
         plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
-            if (spawner == null) return;
+            if (spawner == null || spawner.getLocation() == null) return;
 
             Collection<Entity> entities = spawner.getLocation().getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
             if (entities == null) return;
@@ -50,8 +50,9 @@ public class SpawnerTask extends BukkitRunnable {
             toSpawn.add(new SpawnEntity(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location)));
         });
 
-        thread.setWorkloadDeque(toSpawn);
-        Bukkit.getScheduler().runTask(plugin, thread);
+        Workload workload = new Workload(toSpawn, () -> { });
+        plugin.getWorkloadManager().addWorkload(workload);
+
         /*Bukkit.getScheduler().runTask(plugin, () -> {
             for (CustomEntity customEntity : toSpawn) {
                 LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
