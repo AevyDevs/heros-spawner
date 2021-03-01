@@ -24,7 +24,7 @@ public class SpawnerCommand extends CommandsHandler {
     @Override
     public boolean command(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            switch (args[0].toUpperCase()) {
+            switch (args[0].toLowerCase()) {
                 case "purge": {
                     plugin.getSpawnerHandler().purge();
                     return true;

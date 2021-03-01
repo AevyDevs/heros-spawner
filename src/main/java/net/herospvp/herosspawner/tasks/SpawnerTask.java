@@ -70,7 +70,10 @@ public class SpawnerTask extends BukkitRunnable {
                     }
 
                     CustomEntity customEntity = toSpawn.get(0);
-                    if (customEntity == null || customEntity.getLocation() == null) continue;
+                    if (customEntity == null || customEntity.getLocation() == null) {
+                        toSpawn.remove(0);
+                        continue;
+                    }
 
                     LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
                     entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());

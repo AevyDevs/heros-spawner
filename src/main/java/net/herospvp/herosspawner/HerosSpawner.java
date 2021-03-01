@@ -2,6 +2,7 @@ package net.herospvp.herosspawner;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.herospvp.database.DatabaseLib;
 import net.herospvp.database.lib.Director;
 import net.herospvp.database.lib.Musician;
@@ -58,6 +59,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         new CollectorListener(this);
     }
 
+    @SneakyThrows
     @Override
     public void onDisable() {
         spawnerHandler.save();
