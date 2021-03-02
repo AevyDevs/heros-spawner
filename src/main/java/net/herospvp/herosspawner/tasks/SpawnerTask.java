@@ -43,7 +43,11 @@ public class SpawnerTask extends BukkitRunnable {
             }
 
             if (!found) return;
-            Location location = spawner.getLocation().clone().add(1.5, 0, 1.5);
+
+            int y=0;
+            if (spawner.getEntityType() == EntityType.SILVERFISH) y=1;
+
+            Location location = spawner.getLocation().clone().add(1.5, y, 1.5);
             toSpawn.add(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location));
         });
 
@@ -76,10 +80,17 @@ public class SpawnerTask extends BukkitRunnable {
                     }
 
                     LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
-                    entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());
-                    entity.setCustomNameVisible(true);
-                    entity.setHealth(2);
-                    entity.setFireTicks(80);
+
+                    if (entity.getType() != EntityType.SILVERFISH) {
+                        entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());
+                        entity.setCustomNameVisible(true);
+                        entity.setHealth(2);
+                        entity.setFireTicks(80);
+                    } else {
+                        entity.setCustomName(ChatColor.YELLOW + "Silverfish");
+                        entity.setCustomNameVisible(true);
+                        entity.setHealth(0.1);
+                    }
 
                     toSpawn.remove(0);
                 }

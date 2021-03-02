@@ -112,16 +112,14 @@ public class SpawnerHandler {
     }
 
     public void addAmount(Player player, Block block) {
-        CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();
-
-        Debug.send("heros-spawner", "spawnercreature: {0}", spawnerBlock.getSpawnedType().name());
+        CustomSpawner blockSpawner = getSpawner(block);
 
         int amount = 0;
         for (ItemStack content : player.getInventory().getContents()) {
             if (content == null || content.getType() == Material.AIR) continue;
 
             EntityType entityType = SpawnerItem.getType(content);
-            if (entityType == null || spawnerBlock.getSpawnedType() != entityType) continue;
+            if (entityType == null || blockSpawner.getEntityType() != entityType) continue;
 
             amount += content.getAmount();
             player.getInventory().remove(content);
