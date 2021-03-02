@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.massivecraft.factions.*;
 import lombok.SneakyThrows;
+import net.coreprotect.CoreProtect;
 import net.herospvp.database.lib.Musician;
 import net.herospvp.database.lib.items.Notes;
 import net.herospvp.database.lib.items.Papers;
@@ -97,6 +98,12 @@ public class SpawnerHandler {
             }
         }
 
+        // TODO: TESTARE
+        CoreProtect.getInstance().getAPI().logRemoval(player.getName() + "-"+ spawner.getEntityType() + "[" + spawner.getAmount() +"]",
+                spawner.getLocation(),
+                Material.MOB_SPAWNER,
+                (byte) 0);
+
         this.breakSpawner(spawner);
         return true;
     }
@@ -131,6 +138,11 @@ public class SpawnerHandler {
         }
 
         CustomSpawner customSpawner = getSpawner(block);
+
+        // TODO: TESTARE
+        CoreProtect.getInstance().getAPI().logInteraction(player.getName() + "-"+ customSpawner.getEntityType() + "[" + customSpawner.getAmount() +"]",
+                customSpawner.getLocation());
+
         customSpawner.setAmount(customSpawner.getAmount()+amount);
         plugin.getHologramHandler().updateHologram(customSpawner);
     }
@@ -168,6 +180,12 @@ public class SpawnerHandler {
 
         spawners.put(block.getLocation(), spawner);
         plugin.getHologramHandler().createHologram(spawner);
+
+        // TODO: TESTARE
+        CoreProtect.getInstance().getAPI().logPlacement(player.getName() + "-"+ spawner.getEntityType() + "[" + spawner.getAmount() +"]",
+                spawner.getLocation(),
+                Material.MOB_SPAWNER,
+                (byte) 0);
 
         Debug.send("heros-spawner", "put in the map, contains: {0}", spawners.containsKey(block.getLocation()));
         return true;
