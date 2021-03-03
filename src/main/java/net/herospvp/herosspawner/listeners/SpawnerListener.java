@@ -40,7 +40,7 @@ public class SpawnerListener implements Listener {
         }
 
         if (!plugin.getSpawnerHandler().place(event.getPlayer(), event.getItemInHand(), event.getBlockPlaced())) {
-                event.setCancelled(true);
+            event.setCancelled(true);
         }
     }
 

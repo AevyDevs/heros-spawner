@@ -5,7 +5,6 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.event.FactionCreateEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
 import net.herospvp.herosspawner.HerosSpawner;
-import net.herospvp.herosspawner.objects.CustomSpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

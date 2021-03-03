@@ -52,7 +52,7 @@ public class SpawnerCommand extends CommandsHandler {
 
         Player target = Bukkit.getPlayerExact(args[1]);
         if (target == null) {
-            target.sendMessage("Player non trovato");
+            sender.sendMessage("Player non trovato");
             return true;
         }
 

@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Queue;
 
 public class SpawnerTask extends BukkitRunnable {
@@ -32,10 +33,23 @@ public class SpawnerTask extends BukkitRunnable {
 
         plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
             if (spawner == null || spawner.getLocation() == null) return;
+            Location spawnerLocation = spawner.getLocation();
 
-            Collection<Entity> entities = spawner.getLocation().getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
+            Collection<Entity> entities = spawnerLocation.getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
             if (entities == null) return;
 
+            // Better way to search, TODO: testing
+            Optional<Entity> optionalEntity =
+                    entities.stream()
+                            .filter(
+                                    entity -> entity.getType() == EntityType.PLAYER
+                            ).findFirst();
+
+            if (!optionalEntity.isPresent()) {
+                return;
+            }
+
+            /*
             boolean found = false;
 
             for (Entity nearbyEntity : entities) {
@@ -45,8 +59,8 @@ public class SpawnerTask extends BukkitRunnable {
                 }
             }
 
-            if (!found) return;
-            Location location = spawner.getLocation().clone().add(1.5, 0, 1.5);
+            if (!found) return; */
+            Location location = spawnerLocation.clone().add(1.5, 0, 1.5);
             toSpawn.add(new SpawnEntity(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location)));
         });
 
