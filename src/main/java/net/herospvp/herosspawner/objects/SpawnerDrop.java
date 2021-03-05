@@ -16,12 +16,12 @@ public enum SpawnerDrop {
                     "VhOGU1NDgyYzhjNjhiZTZmZmY5ODFiYTgwNTZiZjJlIn19fQ==",
             EntityType.SILVERFISH, 50),
 
-    ZOMBIE(Material.ROTTEN_FLESH, EntityType.ZOMBIE, 0.5),
-    SKELETON(Material.BONE, EntityType.SKELETON, 0.7),
-    IRON_GOLEM(Material.IRON_INGOT, EntityType.IRON_GOLEM, 1),
+    ZOMBIE(Material.ROTTEN_FLESH, EntityType.ZOMBIE, 1),
+    SKELETON(Material.BONE, EntityType.SKELETON, 3),
+    IRON_GOLEM(Material.IRON_INGOT, EntityType.IRON_GOLEM, 5),
     CREEPER(Material.TNT, EntityType.CREEPER, 0),
-    SNOW_GOLEM(Material.PUMPKIN, EntityType.SNOWMAN, 1.3),
-    VILLAGER(Material.EMERALD, EntityType.VILLAGER, 1.6);
+    SNOW_GOLEM(Material.PUMPKIN, EntityType.SNOWMAN, 8),
+    VILLAGER(Material.EMERALD, EntityType.VILLAGER, 11);
 
     private final Material dropType;
     private final String textureHead;

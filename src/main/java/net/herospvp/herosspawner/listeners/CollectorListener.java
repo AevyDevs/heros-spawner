@@ -5,6 +5,7 @@ import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import net.herospvp.herosspawner.HerosSpawner;
 import net.herospvp.herosspawner.objects.Collector;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -36,7 +37,7 @@ public class CollectorListener implements Listener {
     public void on(InventoryClickEvent event) {
         if (event.getInventory() == null|| event.getInventory().getTitle() == null) return;
 
-        if (event.getInventory().getTitle().contains("Collector")) {
+        if (ChatColor.stripColor(event.getInventory().getTitle()).equals("Collector")) {
             event.setCancelled(true);
             event.setResult(Event.Result.DENY);
 

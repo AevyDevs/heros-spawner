@@ -148,5 +148,13 @@
             <version>2.14.2</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>outpost</groupId>
+            <artifactId>outpost</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/Outpost.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

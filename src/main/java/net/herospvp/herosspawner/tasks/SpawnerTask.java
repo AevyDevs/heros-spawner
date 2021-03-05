@@ -99,18 +99,6 @@ public class SpawnerTask extends BukkitRunnable {
                 count[0]++;
             }
         }.runTaskTimer(plugin, 2, 5);
-
-
-        /*Bukkit.getScheduler().runTask(plugin, () -> {
-            for (CustomEntity customEntity : toSpawn) {
-                LivingEntity entity = (LivingEntity) customEntity.getLocation().getWorld().spawnEntity(customEntity.getLocation(), customEntity.getType());
-                entity.setCustomName(ChatColor.YELLOW + "x" + customEntity.getAmount());
-                entity.setCustomNameVisible(true);
-                entity.setHealth(2);
-                entity.setFireTicks(80);
-            }
-            toSpawn.clear();
-        });*/
     }
 
     public static String toString(Queue<?> queue) {

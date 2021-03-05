@@ -8,6 +8,7 @@ import net.herospvp.heroscore.utils.items.ItemBuilder;
 import net.herospvp.heroscore.utils.strings.StringUtils;
 import net.herospvp.heroscore.utils.strings.message.Message;
 import net.herospvp.heroscore.utils.strings.message.MessageType;
+import net.herospvp.herosspawner.utils.FactionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -36,9 +37,13 @@ public class Collector {
         double amount = SpawnerDrop.getPrice(material)*drops.get(material);
         if (amount == 0) return;
 
+        boolean outpost = FactionUtils.isOutpostFaction(faction);
+        if (outpost) amount *= 1.5;
+
         Econ.deposit(faction.getAccountId(), amount);
 
-        Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai aggiunto &6$&e{0} &falla banca della fazione", amount+"");
+        Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai aggiunto &6$&e{0} &falla banca della fazione{1}",
+                amount+"", outpost ? "&7 (x1.5)" : "");
 
         removeDrop(material);
         this.updateInventory();
@@ -49,7 +54,6 @@ public class Collector {
 
         final double[] total = {0};
 
-        // TODO testing
         drops.entrySet().parallelStream().forEach(entry -> {
             Material key = entry.getKey();
             Double value = entry.getValue();
@@ -60,18 +64,11 @@ public class Collector {
             }
         });
 
-        /*
-        drops.forEach(((material, money) -> {
-            if (material != Material.TNT) {
-                Econ.deposit(faction.getAccountId(), (SpawnerDrop.getPrice(material) * money));
-                total[0] += money;
-            }
-        }));
-        */
-
         if (total[0] == 0) return;
+        boolean outpost = FactionUtils.isOutpostFaction(faction);
+        if (outpost) total[0] *= 1.5;
 
-        Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai venduto un totale di &6$&e{0}", total[0]+"");
+        Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai venduto un totale di &6$&e{0}{1}", total[0]+"", outpost ? " &7(x1.5)" : "");
 
         clear(false);
         this.updateInventory();
@@ -139,9 +136,15 @@ public class Collector {
                 continue;
             }
 
+            double money = amount*SpawnerDrop.getPrice(value.getDropType());
+
+            Faction faction = Factions.getInstance().getFactionById(factionId);
+            boolean outpost = FactionUtils.isOutpostFaction(faction);
+            if (outpost) money *= 1.5;
+
             inventory.setItem(i, new ItemBuilder(value.getDropType()).setLore(
                     "&6▎ &fQuantità: &e"+ rounded,
-                    "&6▎ &fVendita: &6$&e" + StringUtils.formatNumber(amount*SpawnerDrop.getPrice(value.getDropType())),
+                    "&6▎ &fVendita: &6$&e" + StringUtils.formatNumber(money) + (outpost ? " &7(x1.5)" : ""),
                     "",
                     "&f&oClicca per depositare la vendita",
                     "&f&onella banca della fazione &e&o/f bank"
