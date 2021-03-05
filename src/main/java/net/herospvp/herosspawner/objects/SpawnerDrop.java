@@ -3,6 +3,7 @@ package net.herospvp.herosspawner.objects;
 import lombok.Getter;
 import net.herospvp.heroscore.utils.items.ItemBuilder;
 import net.herospvp.heroscore.utils.items.SkullCreator;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -41,7 +42,7 @@ public enum SpawnerDrop {
     public static ItemStack getDrop(EntityType entityType) {
         if (entityType == EntityType.SILVERFISH) {
             return new ItemBuilder(SkullCreator.itemFromBase64(SILVERFISH.textureHead)).setName("&eSilverfish Core")
-                    .setLore("&f&oQuesto item lo puoi vedere", "&f&outilizzando il comando &e&o/sellall").toItemStack();
+                    .setLore("&f&oQuesto item lo puoi vendere", "&f&outilizzando il comando &e&o/sellall").toItemStack();
         }
 
         for (SpawnerDrop value : values()) {
@@ -50,6 +51,11 @@ public enum SpawnerDrop {
             }
         }
         return null;
+    }
+
+    public static boolean isSilverfishDrop(ItemStack itemStack) {
+        return itemStack != null && itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().hasLore()
+                && itemStack.getType() == Material.SKULL_ITEM && ChatColor.stripColor(itemStack.getItemMeta().getLore().get(0)).equals("Questo item lo puoi vendere");
     }
 
     public static double getPrice(Material material) {

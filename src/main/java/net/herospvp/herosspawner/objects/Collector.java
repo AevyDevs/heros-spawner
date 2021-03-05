@@ -125,6 +125,8 @@ public class Collector {
             double amount = drops.get(value.getDropType());
             String rounded = String.format("%.0f", amount);
 
+            if (value.getEntityType() == EntityType.SILVERFISH) continue;
+
             if (value.getEntityType() == EntityType.CREEPER) {
                 inventory.setItem(16, new ItemBuilder(value.getDropType())
                         .setLore(

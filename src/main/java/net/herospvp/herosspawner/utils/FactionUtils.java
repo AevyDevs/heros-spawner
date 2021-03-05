@@ -1,13 +1,13 @@
 package net.herospvp.herosspawner.utils;
 
 import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.struct.Role;
+import com.massivecraft.factions.zcore.fperms.Access;
+import com.massivecraft.factions.zcore.fperms.PermissableAction;
 
 public class FactionUtils {
 
-    public static boolean isMod(FPlayer fPlayer) {
-        Role role = fPlayer.getRole();
-        return role.value >= 2;
+    public static boolean hasSpawnerPerm(FPlayer fPlayer) {
+        return fPlayer.getFaction().getAccess(fPlayer, PermissableAction.SPAWNER) != Access.DENY;
     }
 
 }

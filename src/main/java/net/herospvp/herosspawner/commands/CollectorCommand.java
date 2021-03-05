@@ -31,8 +31,8 @@ public class CollectorCommand extends CommandsHandler {
             return true;
         }
 
-        if (!FactionUtils.isMod(fPlayer)) {
-            Message.sendMessage(sender, MessageType.WARNING, "Collector", "Devi essere almeno mod per aprire il collector!");
+        if (!FactionUtils.hasSpawnerPerm(fPlayer)) {
+            Message.sendMessage(sender, MessageType.WARNING, "Collector", "Non hai il permesso!");
             return true;
         }
 

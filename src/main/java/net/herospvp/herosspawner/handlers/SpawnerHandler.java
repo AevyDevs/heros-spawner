@@ -92,13 +92,12 @@ public class SpawnerHandler {
                 return false;
             }
 
-            if (!FactionUtils.isMod(fPlayer)) {
-                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere almeno mod per poter raccogliere gli spawner!");
+            if (!FactionUtils.hasSpawnerPerm(fPlayer)) {
+                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Non hai il permesso!");
                 return false;
             }
         }
 
-        // TODO: TESTARE
         CoreProtect.getInstance().getAPI().logRemoval(player.getName() + "-"+ spawner.getEntityType() + "[" + spawner.getAmount() +"]",
                 spawner.getLocation(),
                 Material.MOB_SPAWNER,
@@ -138,13 +137,14 @@ public class SpawnerHandler {
         }
 
         CustomSpawner customSpawner = getSpawner(block);
-
-        // TODO: TESTARE
-        CoreProtect.getInstance().getAPI().logInteraction(player.getName() + "-"+ customSpawner.getEntityType() + "[" + customSpawner.getAmount() +"]",
-                customSpawner.getLocation());
-
         customSpawner.setAmount(customSpawner.getAmount()+amount);
         plugin.getHologramHandler().updateHologram(customSpawner);
+
+        CoreProtect.getInstance().getAPI().logPlacement(
+                player.getName() + "-"+ customSpawner.getEntityType() + "[+" + amount +"]",
+                customSpawner.getLocation(),
+                Material.MOB_SPAWNER,
+                (byte) 0);
     }
 
     public boolean place(Player player, ItemStack item, Block block) {
@@ -160,8 +160,8 @@ public class SpawnerHandler {
                 return false;
             }
 
-            if (!FactionUtils.isMod(fPlayer)) {
-                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Devi essere almeno mod per poter piazzare gli spawner!");
+            if (!FactionUtils.hasSpawnerPerm(fPlayer)) {
+                Message.sendMessage(player, MessageType.ERROR, "Spawner", "Non hai il permesso!");
                 return false;
             }
 
@@ -181,7 +181,6 @@ public class SpawnerHandler {
         spawners.put(block.getLocation(), spawner);
         plugin.getHologramHandler().createHologram(spawner);
 
-        // TODO: TESTARE
         CoreProtect.getInstance().getAPI().logPlacement(player.getName() + "-"+ spawner.getEntityType() + "[" + spawner.getAmount() +"]",
                 spawner.getLocation(),
                 Material.MOB_SPAWNER,

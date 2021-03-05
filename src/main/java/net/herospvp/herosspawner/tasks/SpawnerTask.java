@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
 public class SpawnerTask extends BukkitRunnable {
@@ -29,25 +30,25 @@ public class SpawnerTask extends BukkitRunnable {
 
         plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
             if (spawner == null || spawner.getLocation() == null || spawner.getLocation().getWorld() == null) return;
+            Location spawnerLocation = spawner.getLocation();
 
-            Collection<Entity> entities = spawner.getLocation().getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
+            Collection<Entity> entities = spawnerLocation.getWorld().getNearbyEntities(spawner.getLocation(), 10, 10, 10);
             if (entities == null) return;
 
-            boolean found = false;
+            Optional<Entity> optionalEntity =
+                    entities.stream()
+                            .filter(
+                                    entity -> entity.getType() == EntityType.PLAYER
+                            ).findFirst();
 
-            for (Entity nearbyEntity : entities) {
-                if (nearbyEntity.getType() == EntityType.PLAYER) {
-                    found = true;
-                    break;
-                }
+            if (!optionalEntity.isPresent()) {
+                return;
             }
-
-            if (!found) return;
 
             int y=0;
             if (spawner.getEntityType() == EntityType.SILVERFISH) y=1;
 
-            Location location = spawner.getLocation().clone().add(1.5, y, 1.5);
+            Location location = spawnerLocation.clone().add(1.5, y, 1.5);
             toSpawn.add(new CustomEntity(spawner.getEntityType(), spawner.getAmount(), location));
         });
 
