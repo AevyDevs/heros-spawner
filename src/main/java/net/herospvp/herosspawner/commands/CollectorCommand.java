@@ -17,7 +17,7 @@ public class CollectorCommand extends CommandsHandler {
     private final HerosSpawner plugin;
 
     public CollectorCommand(HerosSpawner plugin) {
-        super(plugin, "herospvp.admin", "collector", true, Collections.singletonList("/collector"), false);
+        super(plugin, null, "collector", true, Collections.singletonList("/collector"), false);
         this.plugin = plugin;
     }
 
