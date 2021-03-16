@@ -119,6 +119,7 @@ public class SpawnerHandler {
 
     public void addAmount(Player player, Block block) {
         CustomSpawner blockSpawner = getSpawner(block);
+        if (blockSpawner == null) return;
 
         int amount = 0;
         for (ItemStack content : player.getInventory().getContents()) {

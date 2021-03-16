@@ -40,7 +40,7 @@ public class Collector {
         boolean outpost = FactionUtils.isOutpostFaction(faction);
         if (outpost) amount *= 1.5;
 
-        Econ.deposit(faction.getAccountId(), amount);
+        Econ.depositFactionBalance(faction, amount);
 
         Message.sendMessage(player, MessageType.WARNING, "Collector", "Hai aggiunto &6$&e{0} &falla banca della fazione{1}",
                 amount+"", outpost ? "&7 (x1.5)" : "");
@@ -59,7 +59,7 @@ public class Collector {
             Double value = entry.getValue();
 
             if (key != Material.TNT) {
-                Econ.deposit(faction.getAccountId(), (SpawnerDrop.getPrice(key) * value));
+                Econ.depositFactionBalance(faction, (SpawnerDrop.getPrice(key) * value));
                 total[0] += value;
             }
         });

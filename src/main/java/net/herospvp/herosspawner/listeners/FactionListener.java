@@ -5,7 +5,6 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.event.FactionCreateEvent;
 import com.massivecraft.factions.event.FactionDisbandEvent;
 import net.herospvp.herosspawner.HerosSpawner;
-import net.herospvp.herosspawner.objects.CustomSpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,20 +21,11 @@ public class FactionListener implements Listener {
     public void on(FactionDisbandEvent event) {
         Faction faction = event.getFaction();
 
-        // TODO testing
         plugin.getSpawnerHandler().getSpawners().parallelStream().forEach(spawner -> {
             if (spawner.getFactionId().equals(faction.getId())) {
                 plugin.getSpawnerHandler().breakSpawner(spawner);
             }
         });
-
-        /*
-        for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
-            if (spawner.getFactionId().equals(faction.getId())) {
-                plugin.getSpawnerHandler().breakSpawner(spawner);
-            }
-        }
-        */
 
         plugin.getCollectorHandler().remove(faction.getId());
     }
