@@ -56,6 +56,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         new CollectorListener(this);
         new ExplosionListener(this);
         new HeadListener(this);
+        new InventoryListener(this);
     }
 
     @SneakyThrows
