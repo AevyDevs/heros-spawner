@@ -2,10 +2,8 @@ package net.herospvp.herosspawner.commands;
 
 import net.herospvp.heroscore.utils.CommandsHandler;
 import net.herospvp.herosspawner.HerosSpawner;
-import net.herospvp.herosspawner.objects.CustomSpawner;
 import net.herospvp.herosspawner.objects.SpawnerItem;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -30,14 +28,7 @@ public class SpawnerCommand extends CommandsHandler {
                     return true;
                 }
                 case "checks": {
-                    for (CustomSpawner spawner : plugin.getSpawnerHandler().getSpawners()) {
-                        if (spawner== null) continue;
-
-                        if (spawner.getLocation().getBlock().getType() != Material.MOB_SPAWNER) {
-                            sender.sendMessage("Trovato uno spawner nullo! ID " + spawner.getId() + " rimosso!");
-                            plugin.getSpawnerHandler().breakSpawner(spawner);
-                        }
-                    }
+                    plugin.getSpawnerHandler().checks(() -> {});
                     return true;
                 }
                 default: {

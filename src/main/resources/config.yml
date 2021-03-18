@@ -9,3 +9,10 @@ db:
   user: root
   password: null
   database: faction
+spawners:
+  ZOMBIE: 50000
+  SKELETON: 100000
+  IRON_GOLEM: 150000
+  CREEPER: 250000
+  SNOWMAN: 200000
+  VILLAGER: 300000

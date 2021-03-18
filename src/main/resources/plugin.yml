@@ -9,3 +9,5 @@ softdepend:
 commands:
   spawner:
   collector:
+  top:
+    aliases: [ftop]

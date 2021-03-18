@@ -71,6 +71,18 @@ public class SpawnerHandler {
         return spawners.get(blockLoc);
     }
 
+    public void checks(Runnable done) {
+        for (CustomSpawner spawner : spawners.values()) {
+            if (spawner== null) continue;
+
+            if (spawner.getLocation().getBlock().getType() != Material.MOB_SPAWNER) {
+                Bukkit.getConsoleSender().sendMessage("Trovato uno spawner nullo! ID " + spawner.getId() + " rimosso!");
+                plugin.getSpawnerHandler().breakSpawner(spawner);
+            }
+        }
+        done.run();
+    }
+
     public boolean breakSpawner(Player player, CustomSpawner spawner) {
         FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
 
@@ -215,7 +227,12 @@ public class SpawnerHandler {
             PreparedStatement preparedStatement = null;
             try {
                 preparedStatement = connection.prepareStatement(
-                        notes.createTable(new String[]{"ID int NOT NULL", "FACTIONID long NOT NULL", "ENTITY varchar(20) NOT NULL", "AMOUNT int NOT NULL", "LOCATION varchar(255) NOT NULL"})
+                        notes.createTable(new String[]{
+                                "ID int NOT NULL",
+                                "FACTIONID long NOT NULL",
+                                "ENTITY varchar(20) NOT NULL",
+                                "AMOUNT int NOT NULL",
+                                "LOCATION varchar(255) NOT NULL"})
                 );
                 preparedStatement.executeUpdate();
             } catch (Exception e) {
@@ -253,6 +270,9 @@ public class SpawnerHandler {
                     e.printStackTrace();
                 } finally {
                     instrument.close(preparedStatement);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        checks(() -> {});
+                    },20L);
                     result.accept(spawners.values());
                 }
             });
@@ -280,7 +300,6 @@ public class SpawnerHandler {
                 );
 
                 for (CustomSpawner spawner : spawners.values()) {
-
                     Debug.send("heros-spawner", "spawner saving: [ID:{0}, Loc:<{1}>, Amount:{2}, Type:{3}]",
                             spawner.getId(), LocationUtils.getLiteStringFromLocation(spawner.getLocation()), spawner.getAmount(), spawner.getEntityType().name());
 

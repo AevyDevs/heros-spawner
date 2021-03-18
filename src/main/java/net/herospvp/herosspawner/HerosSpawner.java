@@ -1,6 +1,5 @@
 package net.herospvp.herosspawner;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.herospvp.database.DatabaseLib;
@@ -9,11 +8,10 @@ import net.herospvp.database.lib.Musician;
 import net.herospvp.database.lib.items.Instrument;
 import net.herospvp.herosspawner.commands.CollectorCommand;
 import net.herospvp.herosspawner.commands.SpawnerCommand;
-import net.herospvp.herosspawner.handlers.CollectorHandler;
-import net.herospvp.herosspawner.handlers.HologramHandler;
-import net.herospvp.herosspawner.handlers.SpawnerHandler;
-import net.herospvp.herosspawner.handlers.TaskHandler;
+import net.herospvp.herosspawner.commands.TopCommand;
+import net.herospvp.herosspawner.handlers.*;
 import net.herospvp.herosspawner.listeners.*;
+import net.herospvp.herosspawner.tasks.TopTask;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,8 +26,7 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
     private HologramHandler hologramHandler;
     private SpawnerHandler spawnerHandler;
     private CollectorHandler collectorHandler;
-
-    private WorldGuardPlugin worldGuardPlugin;
+    private TopHandler topHandler;
 
     @Override
     public void onEnable() {
@@ -43,12 +40,16 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         this.hologramHandler = new HologramHandler(this);
         this.taskHandler = new TaskHandler(this);
         this.collectorHandler = new CollectorHandler(this);
+        this.topHandler = new TopHandler(this);
         spawnerHandler.loadAll(result -> {
             this.hologramHandler.load(result);
+            new TopTask(this)
+                    .runTaskTimerAsynchronously(this, 1, 20*60*30);
         });
 
         new SpawnerCommand(this);
         new CollectorCommand(this);
+        new TopCommand(this);
 
         new SpawnerListener(this);
         new FactionListener(this);
