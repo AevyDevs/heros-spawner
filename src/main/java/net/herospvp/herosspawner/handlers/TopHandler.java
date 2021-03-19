@@ -19,7 +19,7 @@ public class TopHandler {
     private final Map<EntityType, Integer> values;
     @Getter private final Map<FactionTop, Double> cache;
     @Getter private Map<FactionTop, Double> top;
-    private final Set<FactionTop> factions;
+    @Getter private final Set<FactionTop> factions;
 
     @Getter private boolean blocked;
 
@@ -60,6 +60,7 @@ public class TopHandler {
     public void clear() {
         this.cache.clear();
         this.top.clear();
+        this.factions.clear();
     }
 
     public FactionTop getFactionInfo(String name) {

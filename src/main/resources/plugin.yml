@@ -6,6 +6,7 @@ softdepend:
   - HolographicDisplays
   - database-lib
   - heros-core
+  - PlaceholderAPI
 commands:
   spawner:
   collector:

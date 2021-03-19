@@ -28,6 +28,7 @@ public class SpawnerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void on(BlockPlaceEvent event) {
+        if (plugin.getEssentials().getUser(event.getPlayer().getUniqueId()).isGodModeEnabled()) return;
         if (event.getItemInHand().getType() != Material.MOB_SPAWNER) return;
 
         if (event.getBlockAgainst().getType() == Material.MOB_SPAWNER) {
@@ -49,6 +50,7 @@ public class SpawnerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void on(BlockBreakEvent event) {
+        if (plugin.getEssentials().getUser(event.getPlayer().getUniqueId()).isGodModeEnabled()) return;
         if (event.getBlock().getType() != Material.MOB_SPAWNER) return;
 
         CustomSpawner spawner = plugin.getSpawnerHandler().getSpawner(event.getBlock());

@@ -1,5 +1,6 @@
 package net.herospvp.herosspawner;
 
+import com.earth2me.essentials.Essentials;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.herospvp.database.DatabaseLib;
@@ -12,6 +13,7 @@ import net.herospvp.herosspawner.commands.TopCommand;
 import net.herospvp.herosspawner.handlers.*;
 import net.herospvp.herosspawner.listeners.*;
 import net.herospvp.herosspawner.tasks.TopTask;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +30,8 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
     private CollectorHandler collectorHandler;
     private TopHandler topHandler;
 
+    private Essentials essentials;
+
     @Override
     public void onEnable() {
         // Config
@@ -35,6 +39,9 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
 
         // Database
         this.initializeDatabase();
+
+        // Essentials
+        this.setupEssentials();
 
         this.spawnerHandler = new SpawnerHandler(this);
         this.hologramHandler = new HologramHandler(this);
@@ -81,5 +88,9 @@ public final class HerosSpawner extends JavaPlugin implements Listener{
         );
         this.director.addInstrument("heros-spawners", instrument);
         this.musician = new Musician(director, instrument, getConfig().getBoolean("db.debug"));
+    }
+
+    private void setupEssentials() {
+        this.essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
     }
 }

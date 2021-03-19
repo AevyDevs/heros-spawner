@@ -2,6 +2,7 @@ package net.herospvp.herosspawner.objects;
 
 import com.google.common.collect.Maps;
 import lombok.Getter;
+import lombok.Setter;
 import net.herospvp.heroscore.utils.strings.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
@@ -12,6 +13,7 @@ import java.util.Map;
 public class FactionTop {
     private final String name;
     private final Map<EntityType, Integer> spawners;
+    @Setter private int position;
 
     public FactionTop(String name) {
         this.name = name;
